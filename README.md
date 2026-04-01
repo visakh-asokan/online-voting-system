@@ -35,7 +35,7 @@ A web-based voting system built using Django that allows users to securely vote 
 
 ## 📂 Project Structure
 
-
+```
 online_voting_system/
 │
 ├── voting/
@@ -43,13 +43,13 @@ online_voting_system/
 ├── manage.py
 ├── requirements.txt
 └── README.md
-
+```
 
 ---
 
 ## ⚙️ Setup Instructions
 
-
+```bash
 git clone <your-repo-link>
 cd online_voting_system
 
@@ -60,6 +60,7 @@ pip install -r requirements.txt
 
 python manage.py migrate
 python manage.py runserver
+```
 
 ---
 
