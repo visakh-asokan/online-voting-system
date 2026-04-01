@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voting System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary:       #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-pale:  #eff6ff;
+        --green:         #16a34a;
+        --green-pale:    #dcfce7;
+        --yellow:        #92400e;
+        --yellow-pale:   #fef3c7;
+        --red:           #b91c1c;
+        --red-pale:      #fee2e2;
+        --gray:          #64748b;
+        --gray-pale:     #f1f5f9;
+        --text:          #0f172a;
+        --text-muted:    #64748b;
+        --border:        #e2e8f0;
+        --card-shadow:   0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+        --radius:        14px;
+    }
+
+    *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 15px;
+        background: #f1f5f9;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
+        color: white;
+        padding: 0 28px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(29,78,216,0.25);
+    }
+
+    .header-brand {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .header-welcome {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.85);
+    }
+
+    .header-welcome strong {
+        color: white;
+        font-weight: 700;
+    }
+
+    .header-link {
+        color: rgba(255,255,255,0.85);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1.5px solid rgba(255,255,255,0.25);
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .header-link:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.5);
+    }
+
+    .logout-btn {
+        background: white;
+        color: var(--primary);
+        border: none;
+        padding: 7px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    .logout-btn:hover {
+        background: #e0eaff;
+        transform: translateY(-1px);
+    }
+
+    /* ── Container ── */
+    .container {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 36px 24px;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 24px;
+        letter-spacing: -0.4px;
+    }
+
+    /* ── Election Card ── */
+    .card {
+        background: white;
+        padding: 24px 28px;
+        margin-bottom: 18px;
+        border-radius: var(--radius);
+        box-shadow: var(--card-shadow);
+        border: 1.5px solid var(--border);
+        transition: box-shadow 0.2s, transform 0.2s;
+        animation: fadeUp 0.35s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.05s; }
+    .card:nth-child(3) { animation-delay: 0.10s; }
+    .card:nth-child(4) { animation-delay: 0.15s; }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .card h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.2px;
+    }
+
+    .card p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 14px;
+    }
+
+    /* ── Status Badges ── */
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .status::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status.active   { background: var(--green-pale);  color: var(--green);  }
+    .status.active::before  { background: var(--green); }
+
+    .status.upcoming { background: var(--yellow-pale); color: var(--yellow); }
+    .status.upcoming::before { background: #d97706; }
+
+    .status.closed   { background: var(--red-pale);    color: var(--red);    }
+    .status.closed::before  { background: var(--red); }
+
+    /* ── Timer ── */
+    .timer {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 10px 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ── Card Footer ── */
+    .card-footer {
+        display: flex;
+        gap: 10px;
+        margin-top: 6px;
+        flex-wrap: wrap;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 20px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:hover:not(.btn-gray) {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .btn-vote {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        color: white;
+        box-shadow: 0 2px 8px rgba(29,78,216,0.3);
+    }
+
+    .btn-results {
+        background: var(--primary-pale);
+        color: var(--primary);
+    }
+
+    .btn-gray {
+        background: var(--gray-pale);
+        color: var(--gray);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    .empty-state .icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-brand">🗳 Voting System</div>
+    <div class="header-right">
+        <span class="header-welcome">Welcome, <strong>{{ user.username }}</strong></span>
+        <a href="{% url 'change_password' %}" class="header-link">Change Password</a>
+        <form action="{% url 'logout' %}" method="post" style="margin:0;">
+            {% csrf_token %}
+            <button class="logout-btn">Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Content -->
+<div class="container">
+    <div class="section-title">Active Elections</div>
+
+    {% for election in elections %}
+    <div class="card">
+        <div class="card-header">
+            <h3>{{ election.title }}</h3>
+
+            {% if election.start_date > now %}
+                <span class="status upcoming">Upcoming</span>
+            {% elif election.end_date < now %}
+                <span class="status closed">Closed</span>
+            {% else %}
+                <span class="status active">Active</span>
+            {% endif %}
+        </div>
+
+        <p>{{ election.description }}</p>
+
+        {% if election.start_date > now %}
+            <div class="timer" data-start="{{ election.start_date|date:'c' }}">⏳ Calculating...</div>
+        {% elif election.end_date >= now %}
+            <div class="timer" data-end="{{ election.end_date|date:'c' }}">⏳ Calculating...</div>
+        {% endif %}
+
+        <div class="card-footer">
+            {% if election.start_date <= now and election.end_date >= now %}
+                <a href="{% url 'vote' election.id %}" class="btn btn-vote">🗳 Cast Vote</a>
+            {% else %}
+                <button class="btn btn-gray">Not Available</button>
+            {% endif %}
+            {% if election.end_date < now %}
+                <a href="{% url 'results' election.id %}" class="btn btn-results">📊 Results</a>
+            {% else %}
+                <button class="btn btn-gray">🔒 Results Locked</button>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <div class="icon">🗳</div>
+        <p>No elections available at this time.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function updateTimers() {
+        document.querySelectorAll('.timer').forEach(timer => {
+            const targetTime = timer.dataset.end || timer.dataset.start;
+            if (!targetTime) return;
+
+            const diff = new Date(targetTime) - new Date();
+
+            if (diff <= 0) {
+                location.reload();
+                return;
+            }
+
+            const h    = Math.floor(diff / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+
+            const label = timer.dataset.end ? 'Closes in' : 'Opens in';
+            timer.innerHTML = `⏳ ${label}: ${h > 0 ? h + 'h ' : ''}${mins}m ${secs}s`;
+        });
+    }
+
+    updateTimers();
+    setInterval(updateTimers, 1000);
+</script>
+
+</body>
+</html>

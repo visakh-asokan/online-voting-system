@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Election Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    :root {
+        --primary:       #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-pale:  #eff6ff;
+        --primary-ring:  rgba(29,78,216,0.15);
+        --green:         #16a34a;
+        --green-pale:    #dcfce7;
+        --yellow:        #92400e;
+        --yellow-pale:   #fef3c7;
+        --text:          #0f172a;
+        --text-muted:    #64748b;
+        --border:        #e2e8f0;
+        --card-shadow:   0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+        --radius:        14px;
+    }
+
+    *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 15px;
+        background: #f1f5f9;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
+        color: white;
+        padding: 0 28px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(29,78,216,0.25);
+    }
+
+    .header-brand {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+
+    .header-back {
+        color: rgba(255,255,255,0.85);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 7px 16px;
+        border-radius: 8px;
+        border: 1.5px solid rgba(255,255,255,0.25);
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .header-back:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.5);
+    }
+
+    /* ── Container ── */
+    .container {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 36px 20px 60px;
+        animation: fadeUp 0.3s ease both;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Election Title Card ── */
+    .title-card {
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 28px;
+        margin-bottom: 18px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .title-card h2 {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .title-card .subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* ── Winner / Tie Banner ── */
+    .banner {
+        border-radius: var(--radius);
+        padding: 18px 24px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border: 1.5px solid;
+        box-shadow: var(--card-shadow);
+    }
+
+    .banner-icon {
+        font-size: 28px;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    .banner-body {
+        flex: 1;
+    }
+
+    .banner-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 4px;
+    }
+
+    .banner-name {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.2px;
+    }
+
+    .banner-votes {
+        font-size: 13px;
+        font-weight: 500;
+        margin-top: 2px;
+        opacity: 0.75;
+    }
+
+    .banner.winner {
+        background: var(--green-pale);
+        border-color: #86efac;
+        color: #14532d;
+    }
+
+    .banner.tie {
+        background: var(--yellow-pale);
+        border-color: #fcd34d;
+        color: #78350f;
+    }
+
+    /* ── Results Card ── */
+    .results-card {
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        margin-bottom: 18px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .results-card h3 {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+    }
+
+    /* ── Vote Bar Rows ── */
+    .candidate-row {
+        margin-bottom: 16px;
+    }
+
+    .candidate-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .row-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 7px;
+    }
+
+    .cand-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .winner-badge {
+        font-size: 11px;
+        font-weight: 700;
+        background: var(--green-pale);
+        color: var(--green);
+        padding: 2px 8px;
+        border-radius: 20px;
+        letter-spacing: 0.2px;
+    }
+
+    .cand-votes {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    /* ── Progress Bar ── */
+    .bar-track {
+        height: 10px;
+        background: var(--border);
+        border-radius: 99px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: 4px;
+    }
+
+    .bar-fill.top {
+        background: linear-gradient(90deg, #16a34a, #22c55e);
+    }
+
+    /* ── Chart Card ── */
+    .chart-card {
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .chart-card h3 {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .chart-wrap {
+        position: relative;
+        height: 280px;
+    }
+
+    /* ── Empty State ── */
+    .empty {
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        padding: 60px 20px;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+</style>
+</head>
+
+<body>
+
+{% if is_admin and election.end_date > now %}
+    <div style="background:#fef3c7;padding:10px;border-radius:5px;margin-bottom:10px;">
+        🔴 Live Results (Voting in progress)
+    </div>
+{% endif %}
+
+
+<!-- Header -->
+<div class="header">
+    <div class="header-brand">🗳 Voting System</div>
+</div>
+
+<!-- Content -->
+<div class="container">
+
+    <!-- Election Title -->
+    <div class="title-card">
+        <h2>{{ election.title }}</h2>
+        <div class="subtitle">Election Results</div>
+    </div>
+
+    {% if candidates %}
+
+        <!-- Winner / Tie Banner -->
+        {% if winners|length > 1 %}
+        <div class="banner tie">
+            <div class="banner-icon">🤝</div>
+            <div class="banner-body">
+                <div class="banner-label">It's a tie</div>
+                <div class="banner-name">
+                    {% for w in winners %}{{ w.name }}{% if not forloop.last %} &amp; {% endif %}{% endfor %}
+                </div>
+                <div class="banner-votes">{{ max_votes }} votes each</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="banner winner">
+            <div class="banner-icon">🏆</div>
+            <div class="banner-body">
+                <div class="banner-label">Winner</div>
+                <div class="banner-name">{{ winners.0.name }}</div>
+                <div class="banner-votes">{{ max_votes }} votes</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Vote Breakdown -->
+        <div class="results-card">
+            <h3>Vote Breakdown</h3>
+
+            {% for c in candidates %}
+            <div class="candidate-row">
+                <div class="row-header">
+                    <span class="cand-name">
+                        {{ c.name }}
+                        {% if c.total_votes == max_votes %}
+                            <span class="winner-badge">
+                                {% if winners|length > 1 %}Tied{% else %}Winner{% endif %}
+                            </span>
+                        {% endif %}
+                    </span>
+                    <span class="cand-votes">{{ c.total_votes }} vote{{ c.total_votes|pluralize }}</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill {% if c.total_votes == max_votes %}top{% endif %}"
+                         style="width: {% if max_votes > 0 %}{% widthratio c.total_votes max_votes 100 %}%{% else %}0%{% endif %}">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-card">
+            <h3>Vote Distribution</h3>
+            <div class="chart-wrap">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="empty">
+            <p>No candidates available for this election.</p>
+        </div>
+    {% endif %}
+
+</div>
+
+<script>
+    const labels = [{% for c in candidates %}"{{ c.name }}",{% endfor %}];
+    const data   = [{% for c in candidates %}{{ c.total_votes }},{% endfor %}];
+    const max    = Math.max(...data);
+
+    const colors = data.map(v => v === max
+        ? 'rgba(22, 163, 74, 0.85)'
+        : 'rgba(29, 78, 216, 0.75)'
+    );
+
+    const borderColors = data.map(v => v === max ? '#16a34a' : '#1d4ed8');
+
+    new Chart(document.getElementById("chart"), {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [{
+                label: "Votes",
+                data,
+                backgroundColor: colors,
+                borderColor: borderColors,
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y} vote${ctx.parsed.y !== 1 ? 's' : ''}`
+                    },
+                    backgroundColor: '#0f172a',
+                    titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: '700', size: 13 },
+                    bodyFont:  { family: "'Plus Jakarta Sans', sans-serif", size: 13 },
+                    padding: 10,
+                    cornerRadius: 8,
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { family: "'Plus Jakarta Sans', sans-serif", weight: '600', size: 13 },
+                        color: '#0f172a',
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0,
+                        font: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                        color: '#64748b',
+                    },
+                    grid: {
+                        color: '#e2e8f0',
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

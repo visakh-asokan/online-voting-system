@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cast Your Vote</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary:       #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-pale:  #eff6ff;
+        --primary-ring:  rgba(29,78,216,0.2);
+        --text:          #0f172a;
+        --text-muted:    #64748b;
+        --border:        #e2e8f0;
+        --card-shadow:   0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+        --radius:        14px;
+    }
+
+    *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 15px;
+        background: #f1f5f9;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #2563eb 100%);
+        color: white;
+        padding: 0 28px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(29,78,216,0.25);
+    }
+
+    .header-brand {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+
+    /* ── Container ── */
+    .container {
+        max-width: 620px;
+        margin: 40px auto;
+        padding: 0 20px 60px;
+        animation: fadeUp 0.3s ease both;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Election Info ── */
+    .election-info {
+        background: white;
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        margin-bottom: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1.5px solid var(--border);
+    }
+
+    .election-info h2 {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.3px;
+        margin-bottom: 6px;
+    }
+
+    .election-info p {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    /* ── Candidates Section ── */
+    .candidates-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        padding-left: 2px;
+    }
+
+    /* ── Candidate Card ── */
+    .candidate {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.15s;
+        position: relative;
+        user-select: none;
+    }
+
+    .candidate:hover {
+        border-color: var(--primary-light);
+        background: var(--primary-pale);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px var(--primary-ring);
+    }
+
+    .candidate.selected {
+        border-color: var(--primary);
+        background: var(--primary-pale);
+        box-shadow: 0 0 0 3px var(--primary-ring), 0 4px 16px var(--primary-ring);
+    }
+
+    /* Hidden native radio */
+    .candidate input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* Custom radio circle */
+    .radio-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.18s, background 0.18s;
+        background: white;
+    }
+
+    .candidate.selected .radio-circle {
+        border-color: var(--primary);
+        background: var(--primary);
+    }
+
+    .radio-circle::after {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: white;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .candidate.selected .radio-circle::after {
+        opacity: 1;
+    }
+
+    /* Content */
+    .candidate-content {
+        flex: 1;
+    }
+
+    .candidate-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 5px;
+    }
+
+    .manifesto {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    /* ── Submit Button ── */
+    .submit-wrap {
+        margin-top: 24px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(29,78,216,0.3);
+        transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+        letter-spacing: 0.1px;
+    }
+
+    .btn-submit:hover {
+        opacity: 0.92;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(29,78,216,0.35);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* ── Back Link ── */
+    .back-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 20px;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .back-link:hover {
+        color: var(--primary);
+    }
+
+    /* ── Notice ── */
+    .notice {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fef9ec;
+        border: 1.5px solid #fde68a;
+        border-radius: 9px;
+        padding: 11px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #92400e;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-brand">🗳 Voting System</div>
+</div>
+
+<!-- Content -->
+<div class="container">
+
+    <!-- Election Info -->
+    <div class="election-info">
+        <h2>{{ election.title }}</h2>
+    </div>
+
+    <div class="notice">
+        ⚠️ Your vote is final and cannot be changed after submission.
+    </div>
+
+    <form method="post" id="vote-form">
+        {% csrf_token %}
+
+        <div class="candidates-label">Select a candidate</div>
+
+        {% for candidate in candidates %}
+        <label class="candidate" id="label-{{ candidate.id }}">
+            <input type="radio" name="candidate" value="{{ candidate.id }}" required>
+            <div class="radio-circle"></div>
+            <div class="candidate-content">
+                <div class="candidate-name">{{ candidate.name }}</div>
+                {% if candidate.manifesto %}
+                    <div class="manifesto">{{ candidate.manifesto }}</div>
+                {% endif %}
+            </div>
+        </label>
+        {% endfor %}
+
+        <div class="submit-wrap">
+            <button type="submit" class="btn-submit">Submit Vote →</button>
+        </div>
+    </form>
+
+    <a href="/" class="back-link">← Back to Home</a>
+
+</div>
+
+<script>
+    const labels = document.querySelectorAll('.candidate');
+
+    labels.forEach(label => {
+        label.addEventListener('click', () => {
+            labels.forEach(l => l.classList.remove('selected'));
+            label.classList.add('selected');
+            label.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+</script>
+
+</body>
+</html>

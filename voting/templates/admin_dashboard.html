@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'DM Sans', Arial, sans-serif;
+        font-size: 15px;
+        background-color: #f0f2f5;
+        color: #2d3748;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: linear-gradient(180deg, #2c3e50, #1a252f);
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar h2 {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255,255,255,0.85);
+        padding: 11px 14px;
+        margin: 4px 0;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .sidebar a:hover {
+        background-color: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .sidebar a.active {
+        background-color: #1abc9c;
+        color: white;
+    }
+
+    .sidebar .logout-form {
+        margin-top: auto;
+    }
+
+    .logout-btn {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.85);
+        padding: 11px 14px;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'DM Sans', Arial, sans-serif;
+        font-weight: 500;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logout-btn:hover {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    /* ── Main ── */
+    .main {
+        margin-left: 240px;
+        padding: 32px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a252f;
+        margin-bottom: 24px;
+    }
+
+    /* ── Election Cards ── */
+    .card {
+        background: white;
+        padding: 24px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        border-left: 4px solid transparent;
+    }
+
+    .card h3 {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1a252f;
+    }
+
+    .card p {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    small {
+        font-size: 13px;
+        color: #777;
+        line-height: 1.8;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    /* ── Status Badges ── */
+    .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .active-status   { background: #d4f6e8; color: #1a7a4a; }
+    .upcoming-status { background: #fff4cc; color: #8a6500; }
+    .closed-status   { background: #fde8e8; color: #b91c1c; }
+
+    /* ── Buttons ── */
+    .btn {
+        display: inline-block;
+        padding: 9px 16px;
+        margin-top: 10px;
+        margin-right: 6px;
+        border-radius: 8px;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'DM Sans', Arial, sans-serif;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
+    }
+
+    .btn-blue   { background-color: #3498db; }
+    .btn-green  { background-color: #2ecc71; }
+    .btn-red    { background-color: #e74c3c; }
+    .btn-orange { background-color: #e67e22; }
+
+    .no-elections {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        text-align: center;
+        color: #888;
+        font-size: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>🗳 Admin</h2>
+    <a href="/admin-dashboard/" class="active">📊 Dashboard</a>
+    <a href="/create-election/">➕ Create Election</a>
+    <a href="/admin/">⚙️ Django Admin</a>
+    <div class="logout-form">
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button class="logout-btn">🚪 Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <div class="page-title">Admin Dashboard</div>
+
+    {% if elections %}
+        {% for election in elections %}
+        <div class="card">
+            <h3>{{ election.title }}</h3>
+            <p>{{ election.description }}</p>
+
+            {% if election.start_date > now %}
+                <span class="status upcoming-status">Upcoming</span>
+            {% elif election.end_date < now %}
+                <span class="status closed-status">Closed</span>
+            {% else %}
+                <span class="status active-status">Active</span>
+            {% endif %}
+
+            <small>
+                Start: {{ election.start_date }}<br>
+                End: {{ election.end_date }}
+            </small>
+
+            <div>
+                <a href="{% url 'add_candidate' election.id %}" class="btn btn-green">Add/Remove Candidate</a>
+                <a href="{% url 'results' election.id %}" class="btn btn-blue">Results</a>
+                <a href="{% url 'stop_voting' election.id %}"
+                   class="btn btn-orange"
+                   onclick="return confirm('Stop this election?')">Stop Voting</a>
+                <a href="{% url 'delete_election' election.id %}"
+                   class="btn btn-red"
+                   onclick="return confirm('Delete this election?')">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-elections">No elections available.</div>
+    {% endif %}
+</div>
+
+</body>
+</html>

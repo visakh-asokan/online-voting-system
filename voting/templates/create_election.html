@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Election</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'DM Sans', Arial, sans-serif;
+        font-size: 15px;
+        background-color: #f0f2f5;
+        color: #2d3748;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: linear-gradient(180deg, #2c3e50, #1a252f);
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar h2 {
+        text-align: center;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255,255,255,0.85);
+        padding: 11px 14px;
+        margin: 4px 0;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .sidebar a:hover {
+        background-color: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .sidebar a.active {
+        background-color: #1abc9c;
+        color: white;
+    }
+
+    .sidebar .logout-form {
+        margin-top: auto;
+    }
+
+    .logout-btn {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.85);
+        padding: 11px 14px;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'DM Sans', Arial, sans-serif;
+        font-weight: 500;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logout-btn:hover {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    /* ── Main ── */
+    .main {
+        margin-left: 240px;
+        padding: 32px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a252f;
+        margin-bottom: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+        background: white;
+        padding: 28px;
+        border-radius: 12px;
+        max-width: 560px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+
+    /* ── Form Elements ── */
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 6px;
+        margin-top: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    label:first-of-type {
+        margin-top: 0;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    textarea {
+        width: 100%;
+        padding: 10px 13px;
+        border: 1.5px solid #dde1e7;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'DM Sans', Arial, sans-serif;
+        color: #2d3748;
+        background: #fafbfc;
+        transition: border-color 0.2s;
+        outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="datetime-local"]:focus,
+    textarea:focus {
+        border-color: #1abc9c;
+        background: white;
+    }
+
+    textarea {
+        resize: none;
+        height: 100px;
+        line-height: 1.5;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: 'DM Sans', Arial, sans-serif;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s;
+        margin-top: 20px;
+        margin-right: 8px;
+    }
+
+    .btn:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
+    }
+
+    .btn-green { background-color: #2ecc71; }
+    .btn-blue  { background-color: #3498db; }
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>🗳 Admin</h2>
+    <a href="/admin-dashboard/">📊 Dashboard</a>
+    <a href="/create-election/" class="active">➕ Create Election</a>
+    <a href="/admin/">⚙️ Django Admin</a>
+    <div class="logout-form">
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button class="logout-btn">🚪 Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <div class="page-title">Create Election</div>
+
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+
+            <label>Election Title</label>
+            <input type="text" name="title" placeholder="Enter election title" required>
+
+            <label>Description</label>
+            <textarea name="description" placeholder="Enter election description"></textarea>
+
+            <label>Start Date & Time</label>
+            <input type="datetime-local" name="start_date" required>
+
+            <label>End Date & Time</label>
+            <input type="datetime-local" name="end_date" required>
+
+            <button type="submit" class="btn btn-green">Create Election</button>
+        </form>
+
+        <a href="/admin-dashboard/" class="btn btn-blue">Back to Dashboard</a>
+    </div>
+</div>
+
+</body>
+</html>
